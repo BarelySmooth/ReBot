@@ -49,7 +49,9 @@ export default async function handleReport(interaction) {
           .setAuthor({
             name: interaction.targetMessage.author.tag,
             iconURL: interaction.targetMessage.author.displayAvatarURL(),
-          }),
+          })
+          .setFooter(interaction.targetMessage.author.id)
+          .setTimestamp(),
       ],
       components: [optionsRow1, optionsRow2(interaction)],
     });
