@@ -41,6 +41,10 @@ export default async function handleReport(interaction) {
       ephemeral: true,
     });
   } else {
+    interaction.reply({
+      content: "This message has been reported to server moderators!",
+      ephemeral: true,
+    });
     modChannel.send({
       embeds: [
         new MessageEmbed()
