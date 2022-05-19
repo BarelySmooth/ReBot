@@ -19,9 +19,24 @@ client.login(process.env.TOKEN);
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isMessageContextMenu()) {
-    handleReport(interaction);
+    try {
+      handleReport(interaction);
+    } catch (error) {
+      interaction.reply({
+        content: "Sorry, something went wrong.",
+        ephemeral: true,
+      });
+    }
   } else if (interaction.isButton()) {
-    handleButtons(interaction);
+    try {
+      handleButtons(interaction);
+    } catch (error) {
+      interaction.reply({
+        content:
+          "Hmm... there was an error. Are you sure the bot has moderation permissions?",
+        ephemeral: true,
+      });
+    }
   }
 });
 

@@ -26,7 +26,7 @@ const optionsRow2 = (interaction) => {
 };
 
 export default async function handleReport(interaction) {
-  console.log(interaction);
+  // console.log(interaction);
 
   const channels = await interaction.guild.channels.fetch();
   const modChannel = channels.find(

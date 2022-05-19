@@ -11,9 +11,18 @@ export default async function handleReport(interaction) {
   } else if (interaction.customId === "mute") {
     const userIdOfMemberToMute = interaction.message.embeds[0].footer.text;
     await interaction.guild.members.fetch();
-    interaction.guild.members.cache
-      .get(userIdOfMemberToMute)
-      .timeout(24 * 60 * 60 * 1000, `Muted by ${interaction.user.tag}`);
+
+    try {
+      await interaction.guild.members.cache
+        .get(userIdOfMemberToMute)
+        .timeout(24 * 60 * 60 * 1000, `Muted by ${interaction.user.tag}`);
+    } catch (error) {
+      return interaction.reply({
+        content:
+          "Sorry, something went wrong. The member might not be in the server.",
+        ephemeral: true,
+      });
+    }
 
     const newEmbed = interaction.message.embeds[0]
       .setTitle("Muted for 24 hours")
@@ -24,9 +33,18 @@ export default async function handleReport(interaction) {
   } else if (interaction.customId === "kick") {
     const userIdOfMemberToKick = interaction.message.embeds[0].footer.text;
     await interaction.guild.members.fetch();
-    interaction.guild.members.cache
-      .get(userIdOfMemberToKick)
-      .kick(`Kicked by ${interaction.user.tag}`);
+
+    try {
+      await interaction.guild.members.cache
+        .get(userIdOfMemberToKick)
+        .kick(`Kicked by ${interaction.user.tag}`);
+    } catch (error) {
+      return interaction.reply({
+        content:
+          "Sorry, something went wrong. The member might not be in the server.",
+        ephemeral: true,
+      });
+    }
 
     const newEmbed = interaction.message.embeds[0]
       .setTitle("Kicked")
@@ -37,9 +55,19 @@ export default async function handleReport(interaction) {
   } else if (interaction.customId === "ban") {
     const userIdOfMemberToBan = interaction.message.embeds[0].footer.text;
     await interaction.guild.members.fetch();
-    interaction.guild.members.cache
-      .get(userIdOfMemberToBan)
-      .ban({ reason: `Banned by ${interaction.user.tag}` });
+
+    try {
+      await interaction.guild.members.cache
+        .get(userIdOfMemberToBan)
+        .ban({ reason: `Banned by ${interaction.user.tag}` });
+    } catch (err) {
+      console.log(err);
+      return interaction.reply({
+        content:
+          "Couldn't ban member! Check if the member is already banned/kicked.",
+        ephemeral: true,
+      });
+    }
 
     const newEmbed = interaction.message.embeds[0]
       .setTitle("Banned")
@@ -49,5 +77,5 @@ export default async function handleReport(interaction) {
     interaction.reply({ content: "Banned", ephemeral: true });
   }
 
-  console.log(interaction.message.embeds[0].author.iconURL);
+  // console.log(interaction.message.embeds[0].author.iconURL);
 }
