@@ -45,6 +45,15 @@ export default async function handleReport(interaction) {
       content: "This message has been reported to server moderators!",
       ephemeral: true,
     });
+
+    // modChannel.messages.fetch({ limit: 50 }).then((messages) => {
+    //   console.log(`Received ${messages.size} messages`);
+    //   //Iterate through the messages here with the variable "messages".
+    //   messages.forEach((message) => {
+    //     if message.
+    //   });
+    // });
+
     modChannel.send({
       embeds: [
         new MessageEmbed()

@@ -17,9 +17,11 @@ export default async function handleReport(interaction) {
         .get(userIdOfMemberToMute)
         .timeout(24 * 60 * 60 * 1000, `Muted by ${interaction.user.tag}`);
     } catch (error) {
+      console.log(error);
+
       return interaction.reply({
         content:
-          "Sorry, something went wrong. The member might not be in the server.",
+          "Sorry, something went wrong. The member might not be in the server or the bot doesn't have permission to timeout the member. \n(PS: Some servers still don't have access to timeouts)",
         ephemeral: true,
       });
     }
@@ -41,7 +43,7 @@ export default async function handleReport(interaction) {
     } catch (error) {
       return interaction.reply({
         content:
-          "Sorry, something went wrong. The member might not be in the server.",
+          "Whoops, something went wrong! The member might not be in the server or the bot doesn't have permission to kick the user.",
         ephemeral: true,
       });
     }
@@ -64,7 +66,7 @@ export default async function handleReport(interaction) {
       console.log(err);
       return interaction.reply({
         content:
-          "Couldn't ban member! Check if the member is already banned/kicked.",
+          "Couldn't ban member! This is probably because the bot doesn't have permission to ban this member or the member has already been banned/kicked.",
         ephemeral: true,
       });
     }

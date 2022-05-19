@@ -54,3 +54,18 @@ client.on("channelCreate", async (channel) => {
     });
   }
 });
+
+client.on("messageCreate", async (message) => {
+  if (message.content === "!rebot uptime") {
+    message.channel.send(
+      `Uptime: ${Math.round(process.uptime() / 60)} minutes`
+    );
+  } else if (message.content === "!rebot help") {
+    message.channel.send(
+      `
+      To set up ReBot, create a **private** channel with the name #\`rebot-reports\`.
+      If you want to report a message, right click the message, and click "Apps > Report to server mods".
+      `
+    );
+  }
+});

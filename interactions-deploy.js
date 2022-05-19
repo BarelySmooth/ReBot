@@ -6,11 +6,11 @@ const interaction_url = `https://discord.com/api/v9/applications/${process.env.A
 const guild_interaction_url = `https://discord.com/api/v9/applications/${process.env.APPLICATION_ID}/guilds/${process.env.GUILD_ID}/commands`; // and this is for local server command
 
 const interaction_json_body = {
-  name: "report",
+  name: "Report to server mods",
   type: 3,
 };
 
-const response = await fetch(guild_interaction_url, {
+const response = await fetch(interaction_url, {
   method: "POST",
   body: JSON.stringify(interaction_json_body),
   headers: {
