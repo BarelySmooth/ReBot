@@ -41,33 +41,44 @@ export default async function handleReport(interaction) {
       ephemeral: true,
     });
   } else {
-    interaction.reply({
+    try {
+      await modChannel.send({
+        embeds: [
+          new MessageEmbed()
+            .setColor("#ff0000")
+            .setDescription(interaction.targetMessage.content)
+            .setAuthor({
+              name: interaction.targetMessage.author.tag,
+              iconURL: interaction.targetMessage.author.displayAvatarURL(),
+            })
+            .setFooter(interaction.targetMessage.author.id)
+            .setTimestamp(),
+        ],
+        components: [optionsRow1, optionsRow2(interaction)],
+      });
+    } catch (error) {
+      console.log(error.code);
+
+      if (error.code === 50001 || error.code === 50013) {
+        return interaction.reply({
+          content:
+            "The bot wasn't set up correctly.\nIf you are a server admin, please make sure the bot has permission to post messages in the #rebot-reports channel!",
+          ephemeral: true,
+        });
+      }
+
+      return interaction.reply({
+        content:
+          "Sorry, something went wrong. Please try again later or contact the server admin.",
+        ephemeral: true,
+      });
+    }
+
+    return interaction.reply({
       content: "This message has been reported to server moderators!",
       ephemeral: true,
     });
 
-    // modChannel.messages.fetch({ limit: 50 }).then((messages) => {
-    //   console.log(`Received ${messages.size} messages`);
-    //   //Iterate through the messages here with the variable "messages".
-    //   messages.forEach((message) => {
-    //     if message.
-    //   });
-    // });
-
-    modChannel.send({
-      embeds: [
-        new MessageEmbed()
-          .setColor("#ff0000")
-          .setDescription(interaction.targetMessage.content)
-          .setAuthor({
-            name: interaction.targetMessage.author.tag,
-            iconURL: interaction.targetMessage.author.displayAvatarURL(),
-          })
-          .setFooter(interaction.targetMessage.author.id)
-          .setTimestamp(),
-      ],
-      components: [optionsRow1, optionsRow2(interaction)],
-    });
     // console.log(interaction.targetMessage.content);
   }
 }
