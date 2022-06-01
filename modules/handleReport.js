@@ -53,11 +53,13 @@ export default async function handleReport(interaction) {
         embeds: [
           new MessageEmbed()
             .setColor("#ff0000")
-            .setDescription(interaction.targetMessage.content)
+            .setDescription(interaction.targetMessage.content + "\n\n")
             .setAuthor({
               name: interaction.targetMessage.author.tag,
               iconURL: interaction.targetMessage.author.displayAvatarURL(),
             })
+            .addField("Reported by", `<@!${interaction.user.id}>`, true)
+            .addField("Reason provided?", `No reason provided.`, true)
             .setFooter(interaction.targetMessage.author.id)
             .setTimestamp(),
         ],
