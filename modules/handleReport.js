@@ -26,7 +26,13 @@ const optionsRow2 = (interaction) => {
 };
 
 export default async function handleReport(interaction) {
-  // console.log(interaction);
+  const createChannelButtonRow = new MessageActionRow().addComponents(
+    new MessageButton()
+      .setCustomId("createReportChannel")
+      .setLabel("Create Report Channel")
+      .setStyle("PRIMARY")
+      .setEmoji("✨")
+  );
 
   const channels = await interaction.guild.channels.fetch();
   const modChannel = channels.find(
@@ -39,6 +45,7 @@ export default async function handleReport(interaction) {
       content:
         "No reports channel found. If you are a server admin, please create a **private** channel with the name #`rebot-reports`.",
       ephemeral: true,
+      components: [createChannelButtonRow],
     });
   } else {
     try {
@@ -78,8 +85,6 @@ export default async function handleReport(interaction) {
       content: "This message has been reported to server moderators!",
       ephemeral: true,
     });
-
-    // console.log(interaction.targetMessage.content);
   }
 }
 

@@ -77,6 +77,57 @@ export default async function handleReport(interaction) {
     interaction.message.components[0].setComponents([]);
     interaction.message.edit({ embeds: [newEmbed] });
     interaction.reply({ content: "Banned", ephemeral: true });
+  } else if (interaction.customId === "createReportChannel") {
+    const author = interaction.member;
+    const channels = await interaction.guild.channels.fetch();
+    const modChannel = channels.find(
+      (channel) => channel.name === "rebot-reports"
+    );
+
+    if (modChannel) {
+      return interaction.reply({
+        content:
+          "A report channel already exists! Try reporting the message again.",
+        ephemeral: true,
+      });
+    }
+
+    if (!author.permissions.has("MANAGE_CHANNELS")) {
+      return interaction.reply({
+        content: `<@${author.id}> You don't have permission to create a report channel. Only a server admin can do that :)`,
+        ephemeral: true,
+      });
+    } else {
+      try {
+        const newChannel = await interaction.guild.channels.create(
+          "rebot-reports",
+          {
+            type: "GUILD_TEXT",
+            permissionOverwrites: [
+              {
+                id: client.user,
+                allow: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+              },
+              {
+                id: interaction.guild.roles.everyone,
+                deny: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+              },
+            ],
+          }
+        );
+
+        await interaction.reply({
+          content: `<@${author.id}> Created a new report channel!`,
+          ephemeral: true,
+        });
+      } catch (error) {
+        console.log(error);
+        return interaction.reply({
+          content: `<@${author.id}> Couldn't create a report channel. Please make sure the bot has permission to create channels.`,
+          ephemeral: true,
+        });
+      }
+    }
   }
 
   // console.log(interaction.message.embeds[0].author.iconURL);
