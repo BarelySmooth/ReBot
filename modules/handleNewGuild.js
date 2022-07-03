@@ -1,17 +1,26 @@
 global.client.on("guildCreate", async (guild) => {
-  //TODO: use code from handleButtons.js file (check the end of the file)
-  guild.channels.fetch().then(async (channels) => {
-    let arrayOfChannels = [];
-    channels.forEach(async (channel) => {
-      arrayOfChannels.push(channel.name);
-    });
+  const channels = await guild.channels.fetch();
+  const modChannel = channels.find(
+    (channel) => channel.name === "rebot-reports"
+  );
 
-    try {
-      if (!arrayOfChannels.includes("rebot-reports")) {
-        await guild.channels.create("rebot-reports");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
+  if (modChannel) return; // Don't do anything if the channel already exists
+
+  try {
+    await guild.channels.create("rebot-reports", {
+      type: "GUILD_TEXT",
+      permissionOverwrites: [
+        {
+          id: client.user,
+          allow: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+        },
+        {
+          id: guild.roles.everyone,
+          deny: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+        },
+      ],
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
