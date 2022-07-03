@@ -13,6 +13,7 @@ global.client = new Client({
 
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  import("./modules/handleNewGuild.js");
 });
 
 client.login(process.env.TOKEN);
