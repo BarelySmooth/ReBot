@@ -1,4 +1,5 @@
 global.client.on("guildCreate", async (guild) => {
+  //TODO: use code from handleButtons.js file (check the end of the file)
   guild.channels.fetch().then(async (channels) => {
     let arrayOfChannels = [];
     channels.forEach(async (channel) => {

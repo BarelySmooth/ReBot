@@ -1,6 +1,16 @@
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed, Permissions } from "discord.js";
 
 export default async function handleReport(interaction) {
+  if (["ignore", "mute", "kick", "ban"].includes(interaction.customId)) {
+    if (!interaction.memberPermissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
+      return interaction.reply({
+        content:
+          "You do not have permission to do this. Only moderators can take action on reports. (make sure you have the `KICK_MEMBERS` permission)",
+        ephemeral: true,
+      });
+    }
+  }
+
   if (interaction.customId === "ignore") {
     const newEmbed = interaction.message.embeds[0]
       .setTitle("Marked as ignored")
