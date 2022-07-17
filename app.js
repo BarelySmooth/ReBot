@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { Client, Intents, MessageEmbed } from "discord.js";
-import handleReport from "./modules/handleReport.js";
+import { showReportModal } from "./modules/handleReport.js";
 import handleButtons from "./modules/handleButtons.js";
 
 global.client = new Client({
@@ -21,13 +21,14 @@ client.login(process.env.TOKEN);
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isMessageContextMenu()) {
     try {
-      handleReport(interaction);
+      showReportModal(interaction);
     } catch (error) {
       interaction.reply({
         content: "Sorry, something went wrong.",
         ephemeral: true,
       });
     }
+  } else if (interaction.isModalSubmit()) {
   } else if (interaction.isButton()) {
     try {
       handleButtons(interaction);

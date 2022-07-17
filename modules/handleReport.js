@@ -1,4 +1,10 @@
-import { MessageEmbed, MessageActionRow, MessageButton } from "discord.js";
+import {
+  MessageEmbed,
+  MessageActionRow,
+  MessageButton,
+  Modal,
+  TextInputComponent,
+} from "discord.js";
 
 const optionsRow1 = new MessageActionRow().addComponents(
   new MessageButton()
@@ -25,7 +31,7 @@ const optionsRow2 = (interaction) => {
   );
 };
 
-export default async function handleReport(interaction) {
+async function postReport(modalInteraction, interaction) {
   const createChannelButtonRow = new MessageActionRow().addComponents(
     new MessageButton()
       .setCustomId("createReportChannel")
@@ -38,10 +44,9 @@ export default async function handleReport(interaction) {
   const modChannel = channels.find(
     (channel) => channel.name === "rebot-reports"
   );
-  //   console.log(modChannel);
 
   if (!modChannel) {
-    return await interaction.reply({
+    return await modalInteraction.reply({
       content:
         "No reports channel found. If you are a server admin, please create a **private** channel with the name #`rebot-reports`.",
       ephemeral: true,
@@ -59,7 +64,11 @@ export default async function handleReport(interaction) {
               iconURL: interaction.targetMessage.author.displayAvatarURL(),
             })
             .addField("Reported by", `<@!${interaction.user.id}>`, true)
-            .addField("Reason provided?", `No reason provided.`, true)
+            .addField(
+              "Reason provided?",
+              modalInteraction.fields.getTextInputValue("reason_field"),
+              true
+            )
             .setFooter(interaction.targetMessage.author.id)
             .setTimestamp(),
         ],
@@ -69,25 +78,53 @@ export default async function handleReport(interaction) {
       console.log(error.code);
 
       if (error.code === 50001 || error.code === 50013) {
-        return interaction.reply({
+        return modalInteraction.reply({
           content:
             "The bot wasn't set up correctly.\nIf you are a server admin, please make sure the bot has permission to post messages in the #rebot-reports channel!",
           ephemeral: true,
         });
       }
 
-      return interaction.reply({
+      return modalInteraction.reply({
         content:
           "Sorry, something went wrong. Please try again later or contact the server admin.",
         ephemeral: true,
       });
     }
 
-    return interaction.reply({
+    return modalInteraction.reply({
       content: "This message has been reported to server moderators!",
       ephemeral: true,
     });
   }
+}
+
+export async function showReportModal(interaction) {
+  const reasonModal = new Modal().setCustomId("reasonModal").setTitle("Reason");
+
+  const reason_input = new TextInputComponent()
+    .setCustomId("reason_field")
+    .setLabel("Reason for reporting")
+    .setStyle("SHORT");
+
+  const reasonFieldRow = new MessageActionRow().addComponents(reason_input);
+  reasonModal.addComponents(reasonFieldRow);
+
+  await interaction.showModal(reasonModal);
+
+  const filter = (interaction) => interaction.customId === "reasonModal";
+  interaction
+    .awaitModalSubmit({ filter, time: 300000 })
+    .then((modalInteraction) => {
+      console.log(`${modalInteraction.customId} was submitted!`);
+
+      try {
+        postReport(modalInteraction, interaction);
+      } catch (error) {
+        console.log(error);
+      }
+    })
+    .catch(console.error);
 }
 
 export { optionsRow1, optionsRow2 };
