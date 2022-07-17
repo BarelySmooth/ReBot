@@ -1,4 +1,4 @@
-import { MessageEmbed, Permissions } from "discord.js";
+import { Permissions } from "discord.js";
 
 export default async function handleReport(interaction) {
   if (["ignore", "mute", "kick", "ban"].includes(interaction.customId)) {
@@ -109,22 +109,19 @@ export default async function handleReport(interaction) {
       });
     } else {
       try {
-        const newChannel = await interaction.guild.channels.create(
-          "rebot-reports",
-          {
-            type: "GUILD_TEXT",
-            permissionOverwrites: [
-              {
-                id: client.user,
-                allow: ["VIEW_CHANNEL", "SEND_MESSAGES"],
-              },
-              {
-                id: interaction.guild.roles.everyone,
-                deny: ["VIEW_CHANNEL", "SEND_MESSAGES"],
-              },
-            ],
-          }
-        );
+        await interaction.guild.channels.create("rebot-reports", {
+          type: "GUILD_TEXT",
+          permissionOverwrites: [
+            {
+              id: client.user,
+              allow: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+            },
+            {
+              id: interaction.guild.roles.everyone,
+              deny: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+            },
+          ],
+        });
 
         await interaction.reply({
           content: `<@${author.id}> Created a new report channel!`,
@@ -139,6 +136,4 @@ export default async function handleReport(interaction) {
       }
     }
   }
-
-  // console.log(interaction.message.embeds[0].author.iconURL);
 }
