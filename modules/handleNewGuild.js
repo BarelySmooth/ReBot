@@ -1,4 +1,8 @@
 global.client.on("guildCreate", async (guild) => {
+  global.client.user.setActivity(`${global.client.guilds.cache.size} servers`, {
+    type: "WATCHING",
+  });
+
   const channels = await guild.channels.fetch();
   const modChannel = channels.find(
     (channel) => channel.name === "rebot-reports"

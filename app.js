@@ -14,6 +14,9 @@ global.client = new Client({
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
   import("./modules/handleNewGuild.js");
+  client.user.setActivity(`${client.guilds.cache.size} servers`, {
+    type: "WATCHING",
+  });
 });
 
 client.login(process.env.TOKEN);
