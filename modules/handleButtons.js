@@ -1,8 +1,15 @@
-import { Permissions } from "discord.js";
+import {
+  EmbedBuilder,
+  PermissionsBitField,
+  ButtonBuilder,
+  ActionRowBuilder,
+} from "discord.js";
 
 export default async function handleReport(interaction) {
   if (["ignore", "mute", "kick", "ban"].includes(interaction.customId)) {
-    if (!interaction.memberPermissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
+    if (
+      !interaction.memberPermissions.has(PermissionsBitField.Flags.KickMembers)
+    ) {
       return interaction.reply({
         content:
           "You do not have permission to do this. Only moderators can take action on reports. (make sure you have the `KICK_MEMBERS` permission)",
@@ -12,11 +19,21 @@ export default async function handleReport(interaction) {
   }
 
   if (interaction.customId === "ignore") {
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Marked as ignored")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    const markAsIgnoredButton = interaction.message.components[1].components[0];
+    let newButton = ButtonBuilder.from(markAsIgnoredButton).setDisabled();
+    let newActionRow = new ActionRowBuilder().addComponents(
+      newButton,
+      interaction.message.components[1].components[1]
+    );
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
     interaction.reply({ content: "Marked as ignored", ephemeral: true });
   } else if (interaction.customId === "mute") {
     const userIdOfMemberToMute = interaction.message.embeds[0].footer.text;
@@ -102,7 +119,7 @@ export default async function handleReport(interaction) {
       });
     }
 
-    if (!author.permissions.has("MANAGE_CHANNELS")) {
+    if (!author.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
       return interaction.reply({
         content: `<@${author.id}> You don't have permission to create a report channel. Only a server admin can do that :)`,
         ephemeral: true,
