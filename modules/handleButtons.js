@@ -16,19 +16,22 @@ export default async function handleReport(interaction) {
         ephemeral: true,
       });
     }
+
+    // selecting the mark_as_ignored_button in order to disable it
+    const markAsIgnoredButton = interaction.message.components[1].components[0];
+    let newButton = ButtonBuilder.from(markAsIgnoredButton).setDisabled();
+
+    // new action row with the disabled button
+    let newActionRow = new ActionRowBuilder().addComponents(
+      newButton,
+      interaction.message.components[1].components[1]
+    );
   }
 
   if (interaction.customId === "ignore") {
     const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Marked as ignored")
       .setColor("#90ee90");
-
-    const markAsIgnoredButton = interaction.message.components[1].components[0];
-    let newButton = ButtonBuilder.from(markAsIgnoredButton).setDisabled();
-    let newActionRow = new ActionRowBuilder().addComponents(
-      newButton,
-      interaction.message.components[1].components[1]
-    );
 
     interaction.message.edit({
       embeds: [newEmbed],
@@ -53,11 +56,14 @@ export default async function handleReport(interaction) {
       });
     }
 
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Muted for 24 hours")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
     interaction.reply({ content: "Muted for 24 hours", ephemeral: true });
   } else if (interaction.customId === "kick") {
     const userIdOfMemberToKick = interaction.message.embeds[0].footer.text;
@@ -75,11 +81,15 @@ export default async function handleReport(interaction) {
       });
     }
 
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Kicked")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
+
     interaction.reply({ content: "Kicked", ephemeral: true });
   } else if (interaction.customId === "ban") {
     const userIdOfMemberToBan = interaction.message.embeds[0].footer.text;
@@ -98,11 +108,15 @@ export default async function handleReport(interaction) {
       });
     }
 
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Banned")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
+
     interaction.reply({ content: "Banned", ephemeral: true });
   } else if (interaction.customId === "createReportChannel") {
     const author = interaction.member;
@@ -126,6 +140,8 @@ export default async function handleReport(interaction) {
       });
     } else {
       try {
+        // TODO: Blocks v14
+        // To repro: Delete/rename rebot-reports channel, and use a server_moderator account to report a message. Click the "create new channel" button that appears.
         await interaction.guild.channels.create("rebot-reports", {
           type: "GUILD_TEXT",
           permissionOverwrites: [
