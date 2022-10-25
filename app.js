@@ -14,6 +14,7 @@ global.client = new Client({
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
   import("./modules/handleNewGuild.js");
+
   client.user.setActivity(`${client.guilds.cache.size} servers`, {
     type: "WATCHING",
   });
@@ -78,7 +79,9 @@ client.on("messageCreate", async (message) => {
     }
 
     message.channel.send(
-      `In ${client.guilds.cache.size} servers!\nUptime: ${secondsToDays(
+      `${
+        client.guilds.cache.size
+      } servers and counting!\nUptime: ${secondsToDays(
         Math.floor(process.uptime())
       )}`
     );
