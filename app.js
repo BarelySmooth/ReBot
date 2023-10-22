@@ -1,13 +1,13 @@
 import "dotenv/config";
-import { Client, Intents, MessageEmbed } from "discord.js";
+import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
 import { showReportModal } from "./modules/handleReport.js";
 import handleButtons from "./modules/handleButtons.js";
 
 global.client = new Client({
   intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MEMBERS,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
   ],
 });
 
@@ -23,7 +23,7 @@ client.once("ready", () => {
 client.login(process.env.TOKEN);
 
 client.on("interactionCreate", async (interaction) => {
-  if (interaction.isMessageContextMenu()) {
+  if (interaction.isMessageContextMenuCommand()) {
     try {
       showReportModal(interaction);
     } catch (error) {
@@ -32,7 +32,6 @@ client.on("interactionCreate", async (interaction) => {
         ephemeral: true,
       });
     }
-  } else if (interaction.isModalSubmit()) {
   } else if (interaction.isButton()) {
     try {
       handleButtons(interaction);
@@ -50,7 +49,7 @@ client.on("channelCreate", async (channel) => {
   if (channel.name === "rebot-reports") {
     await channel.send({
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setColor("#ff0000")
           .setTitle("This channel will be used as the ReBot reports channel!")
           .setDescription(

@@ -11,6 +11,9 @@ global.client.on("guildCreate", async (guild) => {
   if (modChannel) return; // Don't do anything if the channel already exists
 
   try {
+    // TODO: Blocks v14
+    // Invalid form body error
+    // To repro: Kick the bot from the server, and invite it again.
     await guild.channels.create("rebot-reports", {
       type: "GUILD_TEXT",
       permissionOverwrites: [

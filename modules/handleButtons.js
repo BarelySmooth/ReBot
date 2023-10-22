@@ -1,22 +1,46 @@
-import { Permissions } from "discord.js";
+import {
+  EmbedBuilder,
+  PermissionsBitField,
+  ButtonBuilder,
+  ActionRowBuilder,
+} from "discord.js";
 
 export default async function handleReport(interaction) {
+  let markAsIgnoredButton;
+  let newButton;
+  let newActionRow;
+
   if (["ignore", "mute", "kick", "ban"].includes(interaction.customId)) {
-    if (!interaction.memberPermissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
+    if (
+      !interaction.memberPermissions.has(PermissionsBitField.Flags.KickMembers)
+    ) {
       return interaction.reply({
         content:
           "You do not have permission to do this. Only moderators can take action on reports. (make sure you have the `KICK_MEMBERS` permission)",
         ephemeral: true,
       });
     }
+
+    // selecting the mark_as_ignored_button in order to disable it
+    markAsIgnoredButton = interaction.message.components[1].components[0];
+    newButton = ButtonBuilder.from(markAsIgnoredButton).setDisabled();
+
+    // new action row with the disabled button
+    newActionRow = new ActionRowBuilder().addComponents(
+      newButton,
+      interaction.message.components[1].components[1]
+    );
   }
 
   if (interaction.customId === "ignore") {
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Marked as ignored")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
     interaction.reply({ content: "Marked as ignored", ephemeral: true });
   } else if (interaction.customId === "mute") {
     const userIdOfMemberToMute = interaction.message.embeds[0].footer.text;
@@ -36,11 +60,14 @@ export default async function handleReport(interaction) {
       });
     }
 
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Muted for 24 hours")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
     interaction.reply({ content: "Muted for 24 hours", ephemeral: true });
   } else if (interaction.customId === "kick") {
     const userIdOfMemberToKick = interaction.message.embeds[0].footer.text;
@@ -58,11 +85,15 @@ export default async function handleReport(interaction) {
       });
     }
 
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Kicked")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
+
     interaction.reply({ content: "Kicked", ephemeral: true });
   } else if (interaction.customId === "ban") {
     const userIdOfMemberToBan = interaction.message.embeds[0].footer.text;
@@ -81,11 +112,15 @@ export default async function handleReport(interaction) {
       });
     }
 
-    const newEmbed = interaction.message.embeds[0]
+    const newEmbed = EmbedBuilder.from(interaction.message.embeds[0])
       .setTitle("Banned")
       .setColor("#90ee90");
-    interaction.message.components[0].setComponents([]);
-    interaction.message.edit({ embeds: [newEmbed] });
+
+    interaction.message.edit({
+      embeds: [newEmbed],
+      components: [newActionRow],
+    });
+
     interaction.reply({ content: "Banned", ephemeral: true });
   } else if (interaction.customId === "createReportChannel") {
     const author = interaction.member;
@@ -102,13 +137,15 @@ export default async function handleReport(interaction) {
       });
     }
 
-    if (!author.permissions.has("MANAGE_CHANNELS")) {
+    if (!author.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
       return interaction.reply({
         content: `<@${author.id}> You don't have permission to create a report channel. Only a server admin can do that :)`,
         ephemeral: true,
       });
     } else {
       try {
+        // TODO: Blocks v14
+        // To repro: Delete/rename rebot-reports channel, and use a server_moderator account to report a message. Click the "create new channel" button that appears.
         await interaction.guild.channels.create("rebot-reports", {
           type: "GUILD_TEXT",
           permissionOverwrites: [

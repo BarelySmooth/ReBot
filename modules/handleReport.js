@@ -1,42 +1,47 @@
 import {
-  MessageEmbed,
-  MessageActionRow,
-  MessageButton,
-  Modal,
-  TextInputComponent,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  ButtonStyle,
 } from "discord.js";
 
-const optionsRow1 = new MessageActionRow().addComponents(
-  new MessageButton()
+const optionsRow1 = new ActionRowBuilder().addComponents(
+  new ButtonBuilder()
     .setCustomId("mute")
     .setLabel("Mute for 24 hours")
-    .setStyle("DANGER"),
-  new MessageButton()
+    .setStyle(ButtonStyle.Danger),
+  new ButtonBuilder()
     .setCustomId("kick")
     .setLabel("Kick User")
-    .setStyle("DANGER"),
-  new MessageButton().setCustomId("ban").setLabel("Ban User").setStyle("DANGER")
+    .setStyle(ButtonStyle.Danger),
+  new ButtonBuilder()
+    .setCustomId("ban")
+    .setLabel("Ban User")
+    .setStyle(ButtonStyle.Danger)
 );
 
 const optionsRow2 = (interaction) => {
-  return new MessageActionRow().addComponents(
-    new MessageButton()
+  return new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
       .setCustomId("ignore")
       .setLabel("Ignore Report")
-      .setStyle("SECONDARY"),
-    new MessageButton()
-      .setStyle("LINK")
+      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
       .setLabel("View Message in context")
       .setURL(interaction.targetMessage.url)
   );
 };
 
 async function postReport(modalInteraction, interaction) {
-  const createChannelButtonRow = new MessageActionRow().addComponents(
-    new MessageButton()
+  const createChannelButtonRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
       .setCustomId("createReportChannel")
       .setLabel("Create Report Channel")
-      .setStyle("PRIMARY")
+      .setStyle(ButtonStyle.Primary)
       .setEmoji("✨")
   );
 
@@ -65,6 +70,9 @@ async function postReport(modalInteraction, interaction) {
 
       // get the last embed on the message...
       const reportEmbed = message.embeds[message.embeds.length - 1]
+
+      // if the embed is a report of a resolved report, ignore it and move on
+      if (["Marked as ignored", "Muted for 24 hours", "Kicked", "Banned"].includes(reportEmbed.title)) return;
 
       // checking if the desciption of the embed is the same as that of the reported message AND if the message being reported has the same message ID as the one on the embed      
       if ((reportEmbed?.description === interaction.targetMessage.content) && (message.components[1].components[1].url === interaction.targetMessage.url)) {
@@ -96,25 +104,32 @@ async function postReport(modalInteraction, interaction) {
   try {
     await modChannel.send({
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setColor("#ff0000")
           .setDescription(interaction.targetMessage.content + "\n\n")
           .setAuthor({
             name: interaction.targetMessage.author.tag,
             iconURL: interaction.targetMessage.author.displayAvatarURL(),
           })
-          .addField("Reported by", `<@!${interaction.user.id}>`, true)
-          .addField(
-            "Reason provided?",
-            modalInteraction.fields.getTextInputValue("reason_field"),
-            true
+          .addFields(
+            {
+              name: "Reported by",
+              value: `<@!${interaction.user.id}>`,
+              inline: true,
+            },
+            {
+              name: "Reason provided?",
+              value: modalInteraction.fields.getTextInputValue("reason_field"),
+              inline: true,
+            }
           )
-          .setFooter(interaction.targetMessage.author.id)
+          .setFooter({ text: interaction.targetMessage.author.id })
           .setTimestamp(),
       ],
       components: [optionsRow1, optionsRow2(interaction)],
     });
   } catch (error) {
+    console.log(error);
     console.log(error.code);
 
     if (error.code === 50001 || error.code === 50013) {
@@ -139,14 +154,16 @@ async function postReport(modalInteraction, interaction) {
 }
 
 export async function showReportModal(interaction) {
-  const reasonModal = new Modal().setCustomId("reasonModal").setTitle("Reason");
+  const reasonModal = new ModalBuilder()
+    .setCustomId("reasonModal")
+    .setTitle("Reason");
 
-  const reason_input = new TextInputComponent()
+  const reason_input = new TextInputBuilder()
     .setCustomId("reason_field")
     .setLabel("Reason for reporting")
-    .setStyle("SHORT");
+    .setStyle(TextInputStyle.Short);
 
-  const reasonFieldRow = new MessageActionRow().addComponents(reason_input);
+  const reasonFieldRow = new ActionRowBuilder().addComponents(reason_input);
   reasonModal.addComponents(reasonFieldRow);
 
   await interaction.showModal(reasonModal);
@@ -157,13 +174,8 @@ export async function showReportModal(interaction) {
     .then((modalInteraction) => {
       console.log(`${modalInteraction.customId} was submitted!`);
 
-      try {
-        postReport(modalInteraction, interaction);
-      } catch (error) {
-        console.log(error);
-      }
-    })
-    .catch(console.error);
+      postReport(modalInteraction, interaction);
+    });
 }
 
 export { optionsRow1, optionsRow2 };
