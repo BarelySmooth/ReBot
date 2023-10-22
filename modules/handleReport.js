@@ -73,6 +73,7 @@ async function postReport(modalInteraction, interaction) {
 
       // if the embed is a report of a resolved report, ignore it and move on
       if (["Marked as ignored", "Muted for 24 hours", "Kicked", "Banned"].includes(reportEmbed.title)) return;
+      console.log(message) //SECURITY: PLEASE REMOVE BEFORE PRODUCTION
 
       // checking if the desciption of the embed is the same as that of the reported message AND if the message being reported has the same message ID as the one on the embed      
       if ((reportEmbed?.description === interaction.targetMessage.content) && (message.components[1].components[1].url === interaction.targetMessage.url)) {

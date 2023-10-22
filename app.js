@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
+import { version } from "discord.js";
 import { showReportModal } from "./modules/handleReport.js";
 import handleButtons from "./modules/handleButtons.js";
 
@@ -21,6 +22,8 @@ client.once("ready", () => {
 });
 
 client.login(process.env.TOKEN);
+console.log("Discord.js version: " + version);
+console.log("Node.js version: " + process.version);
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isMessageContextMenuCommand()) {
