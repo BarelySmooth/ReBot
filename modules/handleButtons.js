@@ -6,6 +6,10 @@ import {
 } from "discord.js";
 
 export default async function handleReport(interaction) {
+  let markAsIgnoredButton;
+  let newButton;
+  let newActionRow;
+
   if (["ignore", "mute", "kick", "ban"].includes(interaction.customId)) {
     if (
       !interaction.memberPermissions.has(PermissionsBitField.Flags.KickMembers)
@@ -18,11 +22,11 @@ export default async function handleReport(interaction) {
     }
 
     // selecting the mark_as_ignored_button in order to disable it
-    const markAsIgnoredButton = interaction.message.components[1].components[0];
-    let newButton = ButtonBuilder.from(markAsIgnoredButton).setDisabled();
+    markAsIgnoredButton = interaction.message.components[1].components[0];
+    newButton = ButtonBuilder.from(markAsIgnoredButton).setDisabled();
 
     // new action row with the disabled button
-    let newActionRow = new ActionRowBuilder().addComponents(
+    newActionRow = new ActionRowBuilder().addComponents(
       newButton,
       interaction.message.components[1].components[1]
     );
