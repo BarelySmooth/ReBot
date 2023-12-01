@@ -20,7 +20,7 @@
   "homepage": "https://github.com/BarelySmooth/ReBot#readme",
   "dependencies": {
     "@discordjs/rest": "^0.3.0",
-    "discord-api-types": "^0.29.0",
+    "discord-api-types": "^0.37.65",
     "discord.js": "^14.13.0",
     "dotenv": "^16.0.1",
     "node-fetch": "^3.2.6"
