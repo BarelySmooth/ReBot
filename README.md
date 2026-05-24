@@ -3,7 +3,7 @@
     <br>
     ReBot
 </h1>
-
+<b><i>Note: This project is no longer actively maintained, and the bot is no longer online.</i></b>
 <h5 align="center"><a href="https://discord.com/api/oauth2/authorize?client_id=955477918216253510&permissions=1101659204838&scope=bot%20applications.commands">Invite the bot</a></h5>
  ReBot is a discord bot that provides a message menu option to report messages to server moderators.
 <br><br>
